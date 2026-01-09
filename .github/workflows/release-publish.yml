@@ -1,0 +1,68 @@
+name: Release & Publish
+
+on:
+  push:
+    branches:
+      - release
+  workflow_dispatch:
+    inputs:
+      publish_to_npm:
+        description: 'Publish to npm'
+        required: false
+        default: false
+        type: boolean
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          # Syncing branches needs history
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install
+      - name: Build
+        run: pnpm run build
+
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # Used to create the PR (Version Packages)
+          version: pnpm run version-packages
+          # Used to publish (only triggers if the PR is merged)
+          publish: ${{ inputs.publish_to_npm == true && 'pnpm run release' || '' }}
+          commit: 'chore: version packages'
+          title: 'chore: version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Sync back to main if a release happened
+      - name: Sync to Main
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          git checkout main
+          git pull origin main
+          git merge release
+          git push origin main
