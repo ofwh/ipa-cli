@@ -1,0 +1,52 @@
+{
+  "name": "@ipa/cli",
+  "version": "1.1.0",
+  "description": "iOS 应用安装包 ipa 文件整理工具",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "ipa": "./dist/bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsc -p tsconfig.json --watch",
+    "prepare": "npm run build",
+    "test:module": "tsc -p tsconfig.json && node --test tests/modules/*.test.js",
+    "test:cli": "tsc -p tsconfig.json && node --test tests/cli/*.test.js",
+    "link": "npm run build && npm link"
+  },
+  "author": "Larify",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "adm-zip": "^0.6.0",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "plist": "^3.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/plist": "^3.0.5",
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./commands": {
+      "types": "./dist/commands/index.d.ts",
+      "default": "./dist/commands/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "default": "./dist/utils/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ]
+}

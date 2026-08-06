@@ -1,0 +1,4 @@
+interface:
+  display_name: '@ipa/cli Project Overview'
+  short_description: '@ipa/cli 项目实现概览与模块说明'
+  default_prompt: 'Use $project-overview to understand the @ipa/cli codebase structure and module behavior.'
